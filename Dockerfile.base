@@ -2,7 +2,8 @@ FROM ubuntu:22.04
 
 ARG BLOATY_VERSION=v1.1
 
-LABEL "version"="0.1.0"
+# The versioning system used: <bloaty_version>-<docker_img_version>
+LABEL "version"="v1.1-1"
 LABEL org.opencontainers.image.title="Bloaty McBloatface Docker Image"
 LABEL org.opencontainers.image.description="Docker image to run Bloaty McBloatface: a size profiler for binaries."
 LABEL org.opencontainers.image.authors="Carlos Pereira Atencio <carlosperate@embeddedlog.com>"
