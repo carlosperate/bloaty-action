@@ -1,0 +1,32 @@
+FROM ubuntu:22.04
+
+ARG BLOATY_VERSION=v1.1
+
+LABEL "version"="0.1.0"
+LABEL org.opencontainers.image.title="Bloaty McBloatface Docker Image"
+LABEL org.opencontainers.image.description="Docker image to run Bloaty McBloatface: a size profiler for binaries."
+LABEL org.opencontainers.image.authors="Carlos Pereira Atencio <carlosperate@embeddedlog.com>"
+LABEL org.opencontainers.image.source="https://github.com/carlosperate/bloaty-action"
+
+# Install dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && \
+    apt-get install -y git && \
+    apt-get install -y --no-install-recommends build-essential cmake ninja-build && \
+    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Clone, build and install Bloaty McBloatface
+RUN mkdir /git && \
+    git clone https://github.com/google/bloaty.git /git/bloaty && \
+    cd /git/bloaty && \
+    git checkout tags/$BLOATY_VERSION && \
+    git submodule update --init --recursive && \
+    cmake -B build -G Ninja -S . && \
+    cmake --build build && \
+    cmake --build build --target install && \
+    cd / && \
+    rm -rf /git
+
+WORKDIR /home
+
+ENTRYPOINT ["bloaty"]
