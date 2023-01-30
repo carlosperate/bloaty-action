@@ -1,0 +1,20 @@
+name: bloaty
+description: "GitHub Action to run Bloaty McBloatface: a size profiler for binaries"
+author: Carlos Pereira Atencio
+branding:
+  color: orange
+  icon: wind
+inputs:
+  bloaty-args:
+    description: Arguments to pass to Bloaty McBloatface
+    required: true
+outputs:
+  bloaty-output:
+    description: 'The output from Bloaty McBloatface'
+runs:
+  using: docker
+  image: Dockerfile
+  entrypoint: 'bash'
+  args:
+    - -c
+    - bloaty ${{ inputs.bloaty-args }}
