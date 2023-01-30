@@ -1,4 +1,4 @@
-name: bloaty
+name: bloaty-action
 description: "GitHub Action to run Bloaty McBloatface: a size profiler for binaries"
 author: Carlos Pereira Atencio
 branding:
