@@ -17,4 +17,4 @@ runs:
   entrypoint: 'bash'
   args:
     - -c
-    - bloaty ${{ inputs.bloaty-args }}
+    - echo bloaty-output=$(bloaty ${{ inputs.bloaty-args }}) >> $GITHUB_OUTPUT && bloaty ${{ inputs.bloaty-args }}

@@ -8,7 +8,7 @@ on:
 
 jobs:
   test-run:
-    name: Simple tests
+    name: GitHub Action tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -24,3 +24,15 @@ jobs:
       uses: ./
       with:
         bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-after.elf
+    - name: Diff of with the same file, to get known output
+      uses: ./
+      id: diff-same
+      with:
+        bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-before.elf
+    - name: Add results to GitHub Workflow summary
+      run: |
+          echo "Before" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.diff-same.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
+          echo "After" >> $GITHUB_STEP_SUMMARY
+    - name: Check known output from previous step
+      run: python -c "import os; exit(not r'${{ steps.diff-same.outputs.bloaty-output }}' == ' FILE SIZE        VM SIZE    \n --------------  -------------- \n  [ = ]       0  [ = ]       0    TOTAL')"
