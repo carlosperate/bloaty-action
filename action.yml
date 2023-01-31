@@ -1,18 +1,26 @@
-name: bloaty-action
+name: "bloaty-action"
 description: "GitHub Action to run Bloaty McBloatface: a size profiler for binaries"
-author: Carlos Pereira Atencio
+author: "Carlos Pereira Atencio"
 branding:
-  color: orange
-  icon: wind
+  color: "orange"
+  icon: "wind"
 inputs:
   bloaty-args:
-    description: Arguments to pass to Bloaty McBloatface
+    description: "Arguments to pass to Bloaty McBloatface"
     required: true
+  output-to-summary:
+    description: "Add the Bloaty output to the GitHub Actions Job Summary"
+    required: false
+    default: false
 outputs:
   bloaty-output:
-    description: 'The output from Bloaty McBloatface'
+    description: "The output from Bloaty McBloatface"
+  bloaty-output-encoded:
+    description: "bloaty output in an encoded string (so you'll get things like \\n)"
 runs:
   using: docker
   image: Dockerfile
   args:
+    # Echo in the format required to set action output      | send to envvar & stdout | remove the prefix         | echo with e flag to print with new lines
+    #- echo bloaty-output=$(bloaty ${{ inputs.bloaty-args }}) | tee -a $GITHUB_OUTPUT | sed "s/^bloaty-output=//" | xargs -0 echo -e
     - ${{ inputs.bloaty-args }}

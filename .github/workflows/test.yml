@@ -21,10 +21,12 @@ jobs:
       uses: ./
       with:
         bloaty-args: tests/test-elf-files/example-before.elf
+        output-to-summary: false
     - name: Diff two ELF files
       uses: ./
       with:
         bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-after.elf
+        output-to-summary: true
     - name: Diff with the same file twice, to get known output
       uses: ./
       id: diff-same
@@ -33,11 +35,18 @@ jobs:
     - name: Check (known) output from previous step
       run: |
         python -c "import os; \
-                 action_op = b'${{ steps.diff-same.outputs.bloaty-output }}'; \
+                 action_op = b'${{ steps.diff-same.outputs.bloaty-output-encoded }}'; \
                  expected  = b'    FILE SIZE        VM SIZE    \n --------------  -------------- \n  [ = ]       0  [ = ]       0    TOTAL\n'; \
                  exit(not action_op == expected)"
-    - name: Add help output to GitHub Workflow summary
+    - name: Add 'bloaty --help' output to GitHub Workflow summary
       run: |
           echo Adding summary from workflow >> $GITHUB_STEP_SUMMARY
+          echo ---------------------------- >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.bloaty-help.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
-          echo End of workflow summary >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ----- >> $GITHUB_STEP_SUMMARY
+    - name: Echo 'bloaty --help' output
+      run: echo "${{ steps.bloaty-help.outputs.bloaty-output }}"
+    - name: Echo 'bloaty --help' encoded output
+      run: echo -e "${{ steps.bloaty-help.outputs.bloaty-output-encoded }}"

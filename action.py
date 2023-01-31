@@ -42,7 +42,7 @@ def run_bloaty(cmd_list):
         print("\nProcess exited with error code {}".format(process_output.returncode))
         sys.exit(process_output.returncode)
 
-    return process_output.stdout
+    return process_output
 
 
 def add_to_gh_env_var(gh_env_var, key=None, value=None):
@@ -67,25 +67,40 @@ def main():
     parser.add_argument("--action-summary", action="store_true")
     action_args, bloaty_args = parser.parse_known_args()
     if DEBUG_INFO:
-        print("\nAction:INFO: Action args: {}".format(action_args))
+        print("\nAction:INFO: Python script args: {}".format(action_args))
         print("Action:INFO: bloaty args:\n{}{}".format(" " * 13, bloaty_args))
         print(flush=True)
 
     # Run bloaty with provided arguments
-    bloaty_output_bytes = run_bloaty(bloaty_args)
-    bloaty_output = bloaty_output_bytes
+    # Action can pass empty arguments, so remove them first
+    bloaty_args = [arg for arg in bloaty_args if arg]
+    bloaty_process_output = run_bloaty(bloaty_args)
+    bloaty_output_bytes = bloaty_process_output.stdout
     try:
         bloaty_output = bloaty_output_bytes.decode("utf-8")
     except Exception as e:
         print("Action:WARN: Could not decode bloaty output:\n{}\n".format(bloaty_output_bytes), flush=True)
-    else:
-        print(bloaty_output)
+        return 1    # Exit with error code
+    print(bloaty_output)
 
-    # Add bloaty output to the action output
+    # Add bloaty output to the GH Action outputs
     if DEBUG_INFO:
         print("\nAction:INFO: Adding bloaty output to GH Action output.", flush=True)
-    action_output = str(bloaty_output_bytes)[2:-1]  # ASCIIfy the byte string without the b''
-    add_to_gh_env_var("GITHUB_OUTPUT", key="bloaty-output", value=action_output)
+    add_to_gh_env_var("GITHUB_OUTPUT", key="bloaty-output", value=bloaty_output)
+    # ASCIIfy the byte string without the b''
+    encoded_output = str(bloaty_output_bytes)[2:-1]
+    add_to_gh_env_var("GITHUB_OUTPUT", key="bloaty-output-encoded", value=encoded_output)
+
+    # Process any arguments specific to this script
+    if action_args.action_summary or ("INPUT_OUTPUT-TO-SUMMARY" in os.environ and
+            os.environ["INPUT_OUTPUT-TO-SUMMARY"] in ["true", "True", True, 1, "1"]):
+        if DEBUG_INFO:
+            print("\nAction:INFO: Adding bloaty output to GH Action workflow summary.", flush=True)
+            print("             Action arg output-to-summary={}".format(os.environ["INPUT_OUTPUT-TO-SUMMARY"]))
+        add_to_gh_env_var(
+            "GITHUB_STEP_SUMMARY",
+            value="## bloatly output\nFrom command: `{}`\n```\n{}\n```\n\n-----\n".format(bloaty_process_output.args, bloaty_output)
+        )
 
     return 0
 
