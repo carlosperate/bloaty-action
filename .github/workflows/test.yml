@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Print help
+    - name: Print bloaty help
+      id: bloaty-help
       uses: ./
       with:
         bloaty-args: "--help"
@@ -24,15 +25,19 @@ jobs:
       uses: ./
       with:
         bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-after.elf
-    - name: Diff of with the same file, to get known output
+    - name: Diff with the same file twice, to get known output
       uses: ./
       id: diff-same
       with:
         bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-before.elf
-    - name: Add results to GitHub Workflow summary
+    - name: Check (known) output from previous step
       run: |
-          echo "Before" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.diff-same.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
-          echo "After" >> $GITHUB_STEP_SUMMARY
-    - name: Check known output from previous step
-      run: python -c "import os; exit(not r'${{ steps.diff-same.outputs.bloaty-output }}' == ' FILE SIZE        VM SIZE    \n --------------  -------------- \n  [ = ]       0  [ = ]       0    TOTAL')"
+        python -c "import os; \
+                 action_op = b'${{ steps.diff-same.outputs.bloaty-output }}'; \
+                 expected  = b'    FILE SIZE        VM SIZE    \n --------------  -------------- \n  [ = ]       0  [ = ]       0    TOTAL\n'; \
+                 exit(not action_op == expected)"
+    - name: Add help output to GitHub Workflow summary
+      run: |
+          echo Adding summary from workflow >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.bloaty-help.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
+          echo End of workflow summary >> $GITHUB_STEP_SUMMARY

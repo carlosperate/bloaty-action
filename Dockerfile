@@ -6,4 +6,14 @@ LABEL org.opencontainers.image.description="GitHub Action using Docker to run Bl
 LABEL org.opencontainers.image.authors="Carlos Pereira Atencio <carlosperate@embeddedlog.com>"
 LABEL org.opencontainers.image.source="https://github.com/carlosperate/bloaty-action"
 
-ENTRYPOINT ["bloaty"]
+# Install dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends python3 && \
+    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+COPY action.py /home/
+
+WORKDIR /home/
+
+ENTRYPOINT ["python3", "/home/action.py"]

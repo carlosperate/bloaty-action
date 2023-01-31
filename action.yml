@@ -14,7 +14,5 @@ outputs:
 runs:
   using: docker
   image: Dockerfile
-  entrypoint: 'bash'
   args:
-    - -c
-    - echo bloaty-output=$(bloaty ${{ inputs.bloaty-args }}) >> $GITHUB_OUTPUT && bloaty ${{ inputs.bloaty-args }}
+    - ${{ inputs.bloaty-args }}
