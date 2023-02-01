@@ -21,6 +21,7 @@ runs:
   using: docker
   image: Dockerfile
   args:
+    # Old format used before the Python script was added
     # Echo in the format required to set action output      | send to envvar & stdout | remove the prefix         | echo with e flag to print with new lines
     #- echo bloaty-output=$(bloaty ${{ inputs.bloaty-args }}) | tee -a $GITHUB_OUTPUT | sed "s/^bloaty-output=//" | xargs -0 echo -e
     - ${{ inputs.bloaty-args }}

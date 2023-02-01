@@ -37,7 +37,7 @@ jobs:
         python -c "import os; \
                  action_op = b'${{ steps.diff-same.outputs.bloaty-output-encoded }}'; \
                  expected  = b'    FILE SIZE        VM SIZE    \n --------------  -------------- \n  [ = ]       0  [ = ]       0    TOTAL\n'; \
-                 exit(not action_op == expected)"
+                 exit(0 if action_op == expected else 1)"
     - name: Add 'bloaty --help' output to GitHub Workflow summary
       run: |
           echo Adding summary from workflow >> $GITHUB_STEP_SUMMARY
