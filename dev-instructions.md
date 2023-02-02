@@ -12,23 +12,23 @@ git push origin v0 --force
 
 Build image:
 ```
-docker build -t "bloaty" --file Dockerfile.bloaty .
+docker build -t "bloaty" docker-bloaty
 ```
 
 Run image:
 ```
 docker run --rm bloaty --help
-docker run --rm -v $(pwd):/home tests/test-elf-files/example-after.elf -d compileunits -n 30 -s vm
+docker run --rm -v $(pwd):/home test-elf-files/example-after.elf -d compileunits -n 30 -s vm
 ```
 
 Publish image:
 ```
 docker login ghcr.io -u <your_username>
 docker images
-docker tag IMAGE_ID ghcr.io/carlosperate/bloaty:latest
 docker tag IMAGE_ID ghcr.io/carlosperate/bloaty:VERSION
-docker push ghcr.io/carlosperate/bloaty:latest
 docker push ghcr.io/carlosperate/bloaty:VERSION
+docker tag IMAGE_ID ghcr.io/carlosperate/bloaty:latest
+docker push ghcr.io/carlosperate/bloaty:latest
 ```
 
 ### Git tag for the bloaty image
@@ -56,8 +56,15 @@ Publish image:
 ```
 docker login ghcr.io -u <your_username>
 docker images
-docker tag IMAGE_ID ghcr.io/carlosperate/bloaty-action:latest
 docker tag IMAGE_ID ghcr.io/carlosperate/bloaty-action:VERSION
-docker push ghcr.io/carlosperate/bloaty-action:latest
 docker push ghcr.io/carlosperate/bloaty-action:VERSION
+docker tag IMAGE_ID ghcr.io/carlosperate/bloaty-action:latest
+docker push ghcr.io/carlosperate/bloaty-action:latest
+```
+
+### Git tag for the bloaty-action image
+
+```
+git tag -a docker_action_v<version> -m "v<version> release of the bloaty-action Docker image"
+git push origin --tags
 ```

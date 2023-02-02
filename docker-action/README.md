@@ -2,7 +2,7 @@
 
 This docker image is derived from `ghcr.io/carlosperate/bloaty`, which
 Dockerfile is also present in this repository in the
-[../Dockerfile.bloaty](../Dockerfile.bloaty) path.
+[../docker-bloaty/](../docker-bloaty/) directory.
 
 This image installs Python 3 and adds the `action.py` script to process the
 bloaty output and other action features.
