@@ -7,7 +7,7 @@ import shutil
 import argparse
 import subprocess
 
-DEBUG_INFO = True
+DEBUG_INFO = False
 
 def run_bloaty(cmd_list):
     """Run a shell command and return the error code.
@@ -62,6 +62,12 @@ def add_to_gh_env_var(gh_env_var, key=None, value=None):
 
 
 def main():
+    # First check if we need to enable print of debug info
+    global DEBUG_INFO
+    if ("INPUT_ACTION-VERBOSE" in os.environ and
+            os.environ["INPUT_ACTION-VERBOSE"] in ["true", "True", True, 1, "1"]):
+        DEBUG_INFO = True
+
     # Parse the command line arguments
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--action-summary", action="store_true")

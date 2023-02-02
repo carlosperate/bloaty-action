@@ -12,6 +12,10 @@ inputs:
     description: "Add the Bloaty output to the GitHub Actions Job Summary"
     required: false
     default: false
+  action-verbose:
+    description: "Print to log additional info from the action process (not bloaty itself)"
+    required: false
+    default: false
 outputs:
   bloaty-output:
     description: "The output from Bloaty McBloatface"
