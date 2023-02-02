@@ -16,8 +16,8 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends locales python3 && \
     apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-COPY action.py /home/
+COPY action.py /action-script/action.py
 
 WORKDIR /home/
 
-ENTRYPOINT ["python3", "/home/action.py"]
+ENTRYPOINT ["python3", "/action-script/action.py"]
