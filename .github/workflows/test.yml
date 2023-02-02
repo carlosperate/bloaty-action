@@ -20,18 +20,18 @@ jobs:
     - name: Only path to ELF file
       uses: ./
       with:
-        bloaty-args: tests/test-elf-files/example-before.elf
+        bloaty-args: test-elf-files/example-before.elf
         output-to-summary: false
     - name: Diff two ELF files
       uses: ./
       with:
-        bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-after.elf
+        bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
         output-to-summary: true
     - name: Diff with the same file twice, to get known output
       uses: ./
       id: diff-same
       with:
-        bloaty-args: tests/test-elf-files/example-before.elf -- tests/test-elf-files/example-before.elf
+        bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-before.elf
     - name: Check (known) output from previous step
       run: |
         python -c "import os; \

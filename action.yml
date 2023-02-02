@@ -1,5 +1,5 @@
 name: "bloaty-action"
-description: "GitHub Action to run Bloaty McBloatface: a size profiler for binaries"
+description: "Run Bloaty McBloatface: a size profiler for binaries."
 author: "Carlos Pereira Atencio"
 branding:
   color: "orange"
@@ -20,10 +20,10 @@ outputs:
   bloaty-output:
     description: "The output from Bloaty McBloatface"
   bloaty-output-encoded:
-    description: "bloaty output in an encoded string (so you'll get things like \\n)"
+    description: "bloaty output in a string with escaped characters (so you'll get things like \\n)"
 runs:
   using: docker
-  image: Dockerfile
+  image: ghcr.io/carlosperate/bloaty-action:latest
   args:
     # Old format used before the Python script was added
     # Echo in the format required to set action output      | send to envvar & stdout | remove the prefix         | echo with e flag to print with new lines
