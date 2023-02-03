@@ -10,16 +10,14 @@ binaries: https://github.com/google/bloaty/
     bloaty-args: <path_to_your_file_and_any_other_flags>
 ```
 
-For additional examples and how to add a PR comment with a build output size
-diff can be found in the
-"[Additional Action Examples](#additional-action-examples)" section.
+- 🧑‍💻 Additional examples, including PR comments, can be found in the
+  "[Additional Action Examples](#additional-action-examples)" section.
+- 🐳 A `bloaty` Docker image (`ghcr.io/carlosperate/bloaty`) is also
+  provided, more info in the
+  "[Using the Docker Image to run Bloaty directly](#using-the-docker-image-to-run-bloaty-directly)" section.
 
-A Docker image with `bloaty` (`ghcr.io/carlosperate/bloaty`) is also provided,
-more info in the
-"[Using the Docker Image to run Bloaty McBloatface directly](#using-the-docker-image-to-run-bloaty-mcbloatface-directly)"
-section.
 
-## Inputs/Outputs
+## Action Inputs/Outputs
 
 Inputs:
 - `bloaty-args`: **(Required)** All arguments to pass to Bloaty McBloatface.
@@ -31,10 +29,10 @@ Outputs:
 - `bloaty-output-encoded`: The bloaty output in a string with escaped characters (so you'll get things like `\n`). It can be easier to pass this to other action steps.
 
 
-## Using the Docker Image to run Bloaty McBloatface directly
+## Using the Docker image to run Bloaty directly
 
-This repository contains two Dockerfiles and two Docker images hosted in the
-[GitHub Docker Container registry](https://github.blog/2020-09-01-introducing-github-container-registry/).
+This repository contains two Dockerfiles and two Docker images are hosted in
+the [GitHub Docker Container registry](https://github.blog/2020-09-01-introducing-github-container-registry/).
 
 The `ghcr.io/carlosperate/bloaty` Docker image contains the bloaty application
 on its own, and can be used used to run `bloaty` directly in your own
@@ -67,23 +65,22 @@ docker run --rm -v $(pwd):/home ghcr.io/carlosperate/bloaty:latest test-elf-file
    +12%  +397Ki  +5.6% +20.7Ki    TOTAL
 ```
 
-The `ghcr.io/carlosperate/bloaty-action` Docker image is based on the previous
-image, with a custom script to add additional features for integration with
-the GitHub Action CI.
+The other `ghcr.io/carlosperate/bloaty-action` Docker image is based also
+includes a custom script to add additional features for integration with
+the GitHub Actions CI.
 
 ## Additional Action Examples
 
-To add a GitHub Actions Run summary simply use the `output-to-summary` input:
+To add a GitHub Actions Run summary simply set the `output-to-summary` input
+to `true`:
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file & add output to summary
   uses: carlosperate/bloaty-action@v0
   with:
-    bloaty-args: <path_to_your_file_and_any_other_flags>
+    bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
     output-to-summary: true
 ```
-
-![gh-action-summary-screenshot](https://user-images.githubusercontent.com/4189262/216423832-cfad5b15-e206-47fb-a653-45a256f9f267.png)
 
 To add a PR comment you an use the `actions/github-script` action in a step
 to post a comment with the output of a the `carlosperate/bloaty-action` step:
@@ -102,6 +99,10 @@ to post a comment with the output of a the `carlosperate/bloaty-action` step:
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
-        body: '## Build diff\n```\n${{ steps.bloaty-comparison.outputs.bloaty-output-encoded }}```\n'
+        body: '## Bloaty output\n```\n${{ steps.bloaty-comparison.outputs.bloaty-output-encoded }}```\n'
       })
 ```
+
+| Job Summary | PR Comment |
+|-------------|------------|
+| ![gh-action-summary-screenshot](https://user-images.githubusercontent.com/4189262/216423832-cfad5b15-e206-47fb-a653-45a256f9f267.png)<br><br><br> | ![PR comment screenshot](https://user-images.githubusercontent.com/4189262/216636388-9fe86aa8-4d53-47bb-be99-415fec07bc88.png) |
