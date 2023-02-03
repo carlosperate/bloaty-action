@@ -18,6 +18,7 @@ jobs:
       with:
         bloaty-args: "--help"
     - name: Only path to ELF file
+      id: bloaty-single-elf
       uses: ./
       with:
         bloaty-args: test-elf-files/example-before.elf
@@ -50,3 +51,15 @@ jobs:
       run: echo "${{ steps.bloaty-help.outputs.bloaty-output }}"
     - name: Echo 'bloaty --help' encoded output
       run: echo -e "${{ steps.bloaty-help.outputs.bloaty-output-encoded }}"
+    - name: Add a PR comment with the bloaty diff
+      if: ${{ github.event.pull_request }}
+      continue-on-error: true
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '## Bloaty output\n```\n${{ steps.bloaty-single-elf.outputs.bloaty-output-encoded }}```\n'
+          })
