@@ -5,7 +5,7 @@ binaries: https://github.com/google/bloaty/
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file
-  uses: carlosperate/bloaty-action@v0
+  uses: carlosperate/bloaty-action@v1
   with:
     bloaty-args: <path_to_your_file_and_any_other_flags>
 ```
@@ -76,7 +76,7 @@ to `true`:
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file & add output to summary
-  uses: carlosperate/bloaty-action@v0
+  uses: carlosperate/bloaty-action@v1
   with:
     bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
     output-to-summary: true
@@ -87,7 +87,7 @@ to post a comment with the output of a the `carlosperate/bloaty-action` step:
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file
-  uses: carlosperate/bloaty-action@v0
+  uses: carlosperate/bloaty-action@v1
   id: bloaty-comparison
   with:
     bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf

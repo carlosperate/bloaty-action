@@ -3,8 +3,8 @@
 ## Update GitHub Action git tag
 
 ```
-git tag -fa v0 -m "Update v0 tag"
-git push origin v0 --force
+git tag -fa v1 -m "Update v1 tag"
+git push origin v1 --force
 ```
 
 
