@@ -7,7 +7,7 @@ binaries: https://github.com/google/bloaty/
 - name: Run Bloaty McBloatface on an ELF file
   uses: carlosperate/bloaty-action@v1
   with:
-    bloaty-args: <path_to_your_file_and_any_other_flags>
+    bloaty-args: <path_to_your_file_and_any_bloaty_flags>
 ```
 
 - 🧑‍💻 Additional examples, including PR comments, can be found in the
@@ -34,9 +34,9 @@ Outputs:
 This repository contains two Dockerfiles and two Docker images are hosted in
 the [GitHub Docker Container registry](https://github.blog/2020-09-01-introducing-github-container-registry/).
 
-The `ghcr.io/carlosperate/bloaty` Docker image contains the bloaty application
-on its own, and can be used used to run `bloaty` directly in your own
-environment or applications.
+The [`ghcr.io/carlosperate/bloaty`](docker-bloaty/) Docker image contains the
+bloaty application on its own, and can be used used to run `bloaty` directly
+in your own environment or applications.
 
 For example, to diff two ELF files contained in this repo, you can run the
 following command from this repository root directory:
@@ -65,11 +65,19 @@ docker run --rm -v $(pwd):/home ghcr.io/carlosperate/bloaty:latest test-elf-file
    +12%  +397Ki  +5.6% +20.7Ki    TOTAL
 ```
 
-The other `ghcr.io/carlosperate/bloaty-action` Docker image is based also
-includes a custom script to add additional features for integration with
-the GitHub Actions CI.
+The other [`ghcr.io/carlosperate/bloaty-action`](docker-action/) Docker image
+also includes a custom script adding GitHub Actions specific features.
 
 ## Additional Action Examples
+
+To better understand what arguments to use with Bloaty the documentation is
+not very long and a recommended read:
+[google/bloaty/doc/using.md](https://github.com/google/bloaty/blob/52948c107c8f81045e7f9223ec02706b19cfa882/doc/using.md)
+
+Personally, to analyse where the data/memory is being used I like to use:
+```
+bloaty -d compileunits,symbols -s vm <path_to_file>
+```
 
 To add a GitHub Actions Run summary simply set the `output-to-summary` input
 to `true`:
@@ -78,20 +86,22 @@ to `true`:
 - name: Run Bloaty McBloatface on an ELF file & add output to summary
   uses: carlosperate/bloaty-action@v1
   with:
-    bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
+    bloaty-args: -d compileunits,symbols test-elf-files/example-before.elf
     output-to-summary: true
 ```
 
-To add a PR comment you an use the `actions/github-script` action in a step
-to post a comment with the output of a the `carlosperate/bloaty-action` step:
+To add a PR comment, you an add an `id` to the `carlosperate/bloaty-action`
+step, and then use its output with the the
+[`actions/github-script`](https://github.com/actions/github-script/) action to
+post a markdown comment in the PR:
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file
   uses: carlosperate/bloaty-action@v1
-  id: bloaty-comparison
+  id: bloaty-step
   with:
-    bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
-- name: Add a PR comment with the bloaty diff
+    bloaty-args: test-elf-files/example-before.elf
+- name: Add a PR comment with the bloaty output
   uses: actions/github-script@v6
   with:
     script: |
@@ -99,8 +109,50 @@ to post a comment with the output of a the `carlosperate/bloaty-action` step:
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
-        body: '## Bloaty output\n```\n${{ steps.bloaty-comparison.outputs.bloaty-output-encoded }}```\n'
+        body: '## Bloaty output\n```\n${{ steps.bloaty-step.outputs.bloaty-output-encoded }}```\n'
       })
+```
+
+The following example shows how to build your project before and after the
+PR changes and post the size diff as a PR comment:
+
+```yml
+steps:
+  - name: Check out the repo with the full git history
+    uses: actions/checkout@v3
+    with:
+      fetch-depth: '0'
+  - name: Build your project (example for a standard Makefile, change as required)
+    run: make
+  - name: Save the built ELF/Mach-O/PE/COFF file to a different directory where it doesn't get cleaned out
+    run: mv <path_to_your_elf> ../original.elf
+  - name: If it's a PR checkout the base commit
+    if: ${{ github.event.pull_request }}
+    run: git checkout ${{ github.event.pull_request.base.sha }}
+  - name: Clean the build and rebuild with the base commit
+    if: ${{ github.event.pull_request }}
+    run: |
+      make clean
+      make
+  - name: Run Bloaty to compare both output files
+    if: ${{ github.event.pull_request }}
+    id: bloaty-comparison
+    uses: carlosperate/bloaty-action@v1
+    with:
+      bloaty-args: ../original.elf -- <path_to_the_base_commit_elf>
+      output-to-summary: true
+  - name: Add a PR comment with the bloaty diff
+    if: ${{ github.event.pull_request }}
+    continue-on-error: true
+    uses: actions/github-script@v6
+    with:
+      script: |
+        github.rest.issues.createComment({
+          issue_number: context.issue.number,
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          body: '## PR build size diff\n```\n${{ steps.bloaty-comparison.outputs.bloaty-output-encoded }}```\n'
+        })
 ```
 
 | Job Summary | PR Comment |
