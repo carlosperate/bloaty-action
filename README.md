@@ -10,10 +10,11 @@ binaries: https://github.com/google/bloaty/
     bloaty-args: <path_to_your_file_and_any_bloaty_flags>
 ```
 
-- 🧑‍💻 Additional examples, including PR comments, can be found in the
-  "[Additional Action Examples](#additional-action-examples)" section.
-- 🐳 A `bloaty` Docker image (`ghcr.io/carlosperate/bloaty`) is also
-  provided, more info in the
+- 🧑‍💻 Additional examples, including Job Summaries and PR comments, can be
+  found in the "[Additional Action Examples](#additional-action-examples)"
+  section.
+- 🐳 A Bloaty Docker image (`ghcr.io/carlosperate/bloaty`) is also provided,
+  more info in the
   "[Using the Docker Image to run Bloaty directly](#using-the-docker-image-to-run-bloaty-directly)" section.
 
 
@@ -21,12 +22,12 @@ binaries: https://github.com/google/bloaty/
 
 Inputs:
 - `bloaty-args`: **(Required)** All arguments to pass to Bloaty McBloatface.
-- `output-to-summary`: *(Optional)* Add the bloaty output to the GitHub Actions
-  Job Summary.
+- `output-to-summary`: *(Optional)* Include the bloaty output in the
+  [GitHub Actions Job Summary](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/).
 
 Outputs:
-- `bloaty-output`: The output from Bloaty McBloatface
-- `bloaty-output-encoded`: The bloaty output in a string with escaped characters (so you'll get things like `\n`). It can be easier to pass this to other action steps.
+- `bloaty-output`: A string with the output from Bloaty McBloatface
+- `bloaty-output-encoded`: The bloaty output string with escaped characters (so you'll get things like `\n`). It can be easier to pass this to other action steps.
 
 
 ## Using the Docker image to run Bloaty directly
@@ -74,26 +75,33 @@ To better understand what arguments to use with Bloaty the documentation is
 not very long and a recommended read:
 [google/bloaty/doc/using.md](https://github.com/google/bloaty/blob/52948c107c8f81045e7f9223ec02706b19cfa882/doc/using.md)
 
-Personally, to analyse where the data/memory is being used I like to use:
+Personally, I like to use the following flags to analyse where the data/memory is going:
 ```
 bloaty -d compileunits,symbols -s vm <path_to_file>
 ```
 
-To add a GitHub Actions Run summary simply set the `output-to-summary` input
-to `true`:
+To add a the Bloaty output to the
+[GitHub Actions Job Summary](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/)
+simply set the `output-to-summary` input to `true`:
+
+<img width="30%" src="https://user-images.githubusercontent.com/4189262/216423832-cfad5b15-e206-47fb-a653-45a256f9f267.png" align="left" alt="GH Action Run summary screenshot">
 
 ```yaml
-- name: Run Bloaty McBloatface on an ELF file & add output to summary
+- name: Run Bloaty & add output to the run summary
   uses: carlosperate/bloaty-action@v1
   with:
     bloaty-args: -d compileunits,symbols test-elf-files/example-before.elf
     output-to-summary: true
 ```
 
-To add a PR comment, you an add an `id` to the `carlosperate/bloaty-action`
-step, and then use its output with the the
+<br clear="left"/>
+
+To create a PR comment, add an `id` to the `carlosperate/bloaty-action` step,
+and then use its output with the the
 [`actions/github-script`](https://github.com/actions/github-script/) action to
-post a markdown comment in the PR:
+post a markdown comment to the PR:
+
+<img width="30%" src="https://user-images.githubusercontent.com/4189262/216636388-9fe86aa8-4d53-47bb-be99-415fec07bc88.png" align="left" alt="PR comment screenshot">
 
 ```yaml
 - name: Run Bloaty McBloatface on an ELF file
@@ -114,7 +122,7 @@ post a markdown comment in the PR:
 ```
 
 The following example shows how to build your project before and after the
-PR changes and post the size diff as a PR comment:
+PR commits, and how to post the size diff as a PR comment:
 
 ```yml
 steps:
@@ -154,7 +162,3 @@ steps:
           body: '## PR build size diff\n```\n${{ steps.bloaty-comparison.outputs.bloaty-output-encoded }}```\n'
         })
 ```
-
-| Job Summary | PR Comment |
-|-------------|------------|
-| ![gh-action-summary-screenshot](https://user-images.githubusercontent.com/4189262/216423832-cfad5b15-e206-47fb-a653-45a256f9f267.png)<br><br><br> | ![PR comment screenshot](https://user-images.githubusercontent.com/4189262/216636388-9fe86aa8-4d53-47bb-be99-415fec07bc88.png) |
