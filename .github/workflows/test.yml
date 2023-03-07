@@ -28,6 +28,12 @@ jobs:
       with:
         bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
         output-to-summary: true
+    - name: Diff two ELF files (adding title)
+      uses: ./
+      with:
+        bloaty-args: test-elf-files/example-before.elf -- test-elf-files/example-after.elf
+        output-to-summary: true
+        summary-title: The same as before, but with a non-default title
     - name: Diff with the same file twice, to get known output
       uses: ./
       id: diff-same
@@ -43,9 +49,9 @@ jobs:
       run: |
           echo Adding summary from workflow >> $GITHUB_STEP_SUMMARY
           echo ---------------------------- >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.bloaty-help.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo ----- >> $GITHUB_STEP_SUMMARY
     - name: Echo 'bloaty --help' output
       run: echo "${{ steps.bloaty-help.outputs.bloaty-output }}"

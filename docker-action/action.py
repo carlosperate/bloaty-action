@@ -103,9 +103,12 @@ def main():
         if DEBUG_INFO:
             print("\nAction:INFO: Adding bloaty output to GH Action workflow summary.", flush=True)
             print("             Action arg output-to-summary={}".format(os.environ["INPUT_OUTPUT-TO-SUMMARY"]))
+        summary_title = os.environ.get("INPUT_SUMMARY-TITLE", default="bloaty output")
         add_to_gh_env_var(
             "GITHUB_STEP_SUMMARY",
-            value="## bloatly output\nFrom command: `{}`\n```\n{}\n```\n\n-----\n".format(bloaty_process_output.args, bloaty_output)
+            value="## {}\nFrom command: `{}`\n```\n{}\n```\n\n".format(
+                summary_title, bloaty_process_output.args, bloaty_output
+            )
         )
 
     return 0

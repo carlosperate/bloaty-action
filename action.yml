@@ -12,6 +12,10 @@ inputs:
     description: "Add the Bloaty output to the GitHub Actions Job Summary"
     required: false
     default: false
+  summary-title:
+    description: "Title on top of the Bloaty output in the GitHub Actions Job Summary"
+    required: false
+    default: "bloaty output"
   action-verbose:
     description: "Print to log additional info from the action process (not bloaty itself)"
     required: false
@@ -23,6 +27,8 @@ outputs:
     description: "bloaty output in a string with escaped characters (so you'll get things like \\n)"
 runs:
   using: docker
+  # For testing we can build the Docker file by uncommenting switching this line
+  #image: docker-action/Dockerfile
   image: docker://ghcr.io/carlosperate/bloaty-action:latest
   args:
     # Old format used before the Python script was added

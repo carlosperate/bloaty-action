@@ -22,8 +22,10 @@ binaries: https://github.com/google/bloaty/
 
 Inputs:
 - `bloaty-args`: **(Required)** All arguments to pass to Bloaty McBloatface.
-- `output-to-summary`: *(Optional)* Include the bloaty output in the
-  [GitHub Actions Job Summary](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/).
+- `output-to-summary`: *(Optional, default `false`)* Boolean (`true` or `false`) to include
+  the bloaty output in the [GitHub Actions Job Summary](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/).
+- `summary-title`: *(Optional, default `"bloaty output"`)* If
+  `output-to-summary` is enabled, this is the title on top of the bloaty output.
 
 Outputs:
 - `bloaty-output`: A string with the output from Bloaty McBloatface
@@ -32,12 +34,12 @@ Outputs:
 
 ## Using the Docker image to run Bloaty directly
 
-This repository contains two Dockerfiles and two Docker images are hosted in
+This repository contains two Dockerfiles and the two Docker images are hosted in
 the [GitHub Docker Container registry](https://github.blog/2020-09-01-introducing-github-container-registry/).
 
 The [`ghcr.io/carlosperate/bloaty`](docker-bloaty/) Docker image contains the
-bloaty application on its own, and can be used used to run `bloaty` directly
-in your own environment or applications.
+bloaty application on its own, and can be used used to easily run `bloaty`
+directly in your own environment or applications.
 
 For example, to diff two ELF files contained in this repo, you can run the
 following command from this repository root directory:
@@ -67,17 +69,18 @@ docker run --rm -v $(pwd):/home ghcr.io/carlosperate/bloaty:latest test-elf-file
 ```
 
 The other [`ghcr.io/carlosperate/bloaty-action`](docker-action/) Docker image
-also includes a custom script adding GitHub Actions specific features.
+is built on top of the base `bloaty` image to run with GitHub Actions, and
+includes a custom script adding GitHub Actions specific features.
 
 ## Additional Action Examples
 
-To better understand what arguments to use with Bloaty the documentation is
+To better understand what arguments to use with Bloaty, the documentation is
 not very long and a recommended read:
 [google/bloaty/doc/using.md](https://github.com/google/bloaty/blob/52948c107c8f81045e7f9223ec02706b19cfa882/doc/using.md)
 
 Personally, I like to use the following flags to analyse where the data/memory is going:
 ```
-bloaty -d compileunits,symbols -s vm <path_to_file>
+bloaty -d compileunits,symbols --domain=vm <path_to_file>
 ```
 
 To add a the Bloaty output to the
@@ -92,6 +95,7 @@ simply set the `output-to-summary` input to `true`:
   with:
     bloaty-args: -d compileunits,symbols test-elf-files/example-before.elf
     output-to-summary: true
+    summary-title: "Size profile of `example-before.elf` largest components"
 ```
 
 <br clear="left"/>
