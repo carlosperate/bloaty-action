@@ -49,10 +49,14 @@ jobs:
       run: |
           echo Adding summary from workflow >> $GITHUB_STEP_SUMMARY
           echo ---------------------------- >> $GITHUB_STEP_SUMMARY
+          echo 'Default:' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.bloaty-help.outputs.bloaty-output }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo ----- >> $GITHUB_STEP_SUMMARY
+          echo 'Encoded:' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.bloaty-help.outputs.bloaty-output-encoded }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
     - name: Echo 'bloaty --help' output
       run: echo "${{ steps.bloaty-help.outputs.bloaty-output }}"
     - name: Echo 'bloaty --help' encoded output
