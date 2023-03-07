@@ -49,7 +49,7 @@ docker build -t "bloaty-action" docker-action
 Run image:
 ```
 docker run --rm bloaty-action --help
-docker run --rm -v $(pwd):/home bloaty-action tests/test-elf-files/example-after.elf
+docker run --rm -v $(pwd):/home bloaty-action test-elf-files/example-after.elf
 ```
 
 Publish image:
